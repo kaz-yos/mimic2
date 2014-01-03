@@ -116,7 +116,7 @@ for i in range(len(dict_of_tables)):
     first_line = merge_file.readline()
 
     ## Open the final version for writing
-    merge_file_final = open(file = "test" + data_file_name + "merge_final.txt", mode = "w")
+    merge_file_final = open(file = "data_" + data_file_name + "merge_final.txt", mode = "w")
 
     ## Write the header
     merge_file_final.write(first_line)
