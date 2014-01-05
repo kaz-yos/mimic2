@@ -46,8 +46,8 @@ table(dataIcuStayDetail$ICUSTAY_FIRST_CAREUNIT)
 SAPS distribution: study cohort
 --------------------
 ```{r, w = 10}
-ggplot(data = subset(dataIcuStayDetail, HOSPITAL_EXPIRE_FLG %in% c("Y","N")),
-       mapping = aes(x = SAPSI_FIRST, fill = HOSPITAL_EXPIRE_FLG)) +
+ggplot(data = subset(dataIcuStayDetail, ICUSTAY_EXPIRE_FLG %in% c("Y","N")),
+       mapping = aes(x = SAPSI_FIRST, fill = ICUSTAY_EXPIRE_FLG)) +
     layer(geom = "histogram", position = "dodge", binwidth = 1) +
     theme_bw() +
     theme(legend.key = element_blank())
@@ -98,14 +98,14 @@ nrow(dataIcuStayDetail)
 In-hospital death
 --------------------
 ```{r}
-table(dataIcuStayDetail$HOSPITAL_EXPIRE_FLG)
+table(dataIcuStayDetail$ICUSTAY_EXPIRE_FLG)
 ```
 
 SAPS distribution: study cohort
 --------------------
 ```{r, w = 10}
 ggplot(data = dataIcuStayDetail,
-       mapping = aes(x = SAPSI_FIRST, fill = HOSPITAL_EXPIRE_FLG)) +
+       mapping = aes(x = SAPSI_FIRST, fill = ICUSTAY_EXPIRE_FLG)) +
     layer(geom = "histogram", position = "dodge", binwidth = 1) +
     theme_bw() +
     theme(legend.key = element_blank())
