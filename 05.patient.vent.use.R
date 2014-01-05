@@ -12,50 +12,54 @@ dataVentilator <- read.csv("data_CHARTEVENTS-vent.txt")
 dim(dataVentilator)
 ## [1] 254851     16
 
-## Check unique patients
-length(unique(dataVentilator$SUBJECT_ID))
-## n = 581. Not every one of 663 people used ventilators.
+## Check unique combinations of subject and icu ID
+dataVentilatorUniquePtIcu <- unique(dataVentilator[c("SUBJECT_ID","ICUSTAY_ID")])
+head(dataVentilatorUniquePtIcu)
 
-## If none of these variables are present, safe to assume the patient was never on ventilator.
-## http://mimic.physionet.org/UserGuide/node83.html
-## 6.2.23 Ventilators
-## ITEMID  LABEL      CATEGORY
-## ---------------------------
-## 505     peep              [value1num]
-## 506     peep              [value1num]
-## 535     PeakInspPressure  [value1num]
-## 543     PlateauPressure   [value1num]
-## 544     Plateau Time (7200)
-## 545     Plateau-Off
-## 619     Respiratory Rate Set
-##  39     Airway Size
-## 535     Peak Insp. Pressure
-## 683     Tidal Volume (Set)
-## 720     Ventilator Mode
-## 721     Ventilator No.
-## 722     Ventilator Type
-## 732     Waveform-Vent
+## Add ventilator indicator
+## dataVentilatorUniquePtIcu$vent = "Y"
+dataVentilatorUniquePtIcu$vent <- 1
+
 
 ## Subject IDs of ventilator users
-subjectIdsOfVentilatorUsers <- unique(dataVentilator$SUBJECT_ID)
+## subjectIdsOfVentilatorUsers <- unique(dataVentilator$SUBJECT_ID)
 
 ## Create a use indicator DF
-subjectIdsOfVentilatorUsers <- data.frame(SUBJECT_ID = subjectIdsOfVentilatorUsers, vent = "Yes")
+## subjectIdsOfVentilatorUsers <- data.frame(SUBJECT_ID = subjectIdsOfVentilatorUsers, vent = "Yes")
 
-## Load the 663 IDs as a data frame
-subjectIds <- read.csv("~/statistics/mimic2/subject_ids.csv")
+## ## Load the 663 IDs as a data frame
+## subjectIds <- read.csv("~/statistics/mimic2/subject_ids.csv")
+
+## Load ICU stay detail (most important) 2014-01-05
+dataIcuStayDetail <- read.csv("~/mimic2/data_ICUSTAY_DETAIL-merge_final.txt")
+## n = 497
+dataIcuStayDetail <- subset(dataIcuStayDetail,
+                            !is.na(SAPSI_FIRST) &
+                            SAPSI_FIRST > 20 &
+                            ICUSTAY_FIRST_FLG == "Y" &
+                            HOSPITAL_FIRST_FLG == "Y" &
+                            ICUSTAY_FIRST_CAREUNIT == "MICU"
+                            )
+
+## Merge to these people
+dfVentUseIndicator <- merge(x = dataIcuStayDetail[c("SUBJECT_ID","ICUSTAY_ID")],
+                            y = dataVentilatorUniquePtIcu,
+                            by = c("SUBJECT_ID","ICUSTAY_ID"),
+                            all.x = TRUE, all.y = FALSE # left join
+                            )
 
 ## Merge
-dfVentUseIndicator <- merge(x = subjectIdsOfVentilatorUsers,
-                            y = subjectIds,
-                            all.x = TRUE, all.y = TRUE # outer join
-                            )
+## dfVentUseIndicator <- merge(x = subjectIdsOfVentilatorUsers,
+##                             y = subjectIds,
+##                             all.x = TRUE, all.y = TRUE # outer join
+##                             )
 
 ## Convert a character vector
 dfVentUseIndicator$vent <- as.character(dfVentUseIndicator$vent)
 
 ## NA's are No
-dfVentUseIndicator$vent[is.na(dfVentUseIndicator$vent)] <- "No"
+## dfVentUseIndicator$vent[is.na(dfVentUseIndicator$vent)] <- "No"
+dfVentUseIndicator$vent[is.na(dfVentUseIndicator$vent)] <- 0
 
 ## Summary
 table(dfVentUseIndicator$vent)

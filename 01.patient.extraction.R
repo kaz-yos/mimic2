@@ -8,11 +8,16 @@ table(dataIcuStayDetail$ICUSTAY_FIRST_CAREUNIT)
 dataIcuStayDetail <- subset(dataIcuStayDetail,
                             ICUSTAY_FIRST_CAREUNIT == "MICU" &
                             !is.na(SAPSI_FIRST) & 
-                            SAPSI_FIRST > 20
+                            SAPSI_FIRST > 20 &
+                            ICUSTAY_FIRST_FLG == "Y" &  # 2014-01-05
+                            HOSPITAL_FIRST_FLG == "Y"   # 2014-01-05
                             )
 
-## n = 663
+## n = 663: 2014-01-05 Fix. n = 497
 dim(dataIcuStayDetail)
+
+## Unique icustay ID / subject ID
+head(dataIcuStayDetail[c("SUBJECT_ID","ICUSTAY_ID")], 20)
 
 ## Subject IDs for those who we want
 subjectIds <- dataIcuStayDetail$SUBJECT_ID
@@ -24,6 +29,9 @@ subjectDataframe <- data.frame(SUBJECT_ID = subjectIds)
 ## Write to a file
 write.csv(subjectDataframe, file = "subject_ids.csv")
 
+
+
+## Preliminary analysis
 
 
 

@@ -1,0 +1,118 @@
+Critical Data Marathon: Team SAPS
+==================
+<!--
+    ```
+-->
+```{r, message = FALSE, tidy = FALSE, echo = F}
+## knitr configuration: http://yihui.name/knitr/options#chunk_options
+warnMessage <- TRUE
+set_alias(w = "fig.width", h = "fig.height", res = "results")
+opts_chunk$set(comment = "##", error= TRUE, warning = warnMessage, message = warnMessage,
+               tidy = FALSE, cache = F, echo = T,
+               fig.width = 7, fig.height = 7, dev.args = list(family = "sans"))
+## for rgl
+knit_hooks$set(rgl = hook_rgl, webgl = hook_webgl)
+## for animation
+opts_knit$set(animation.fun = hook_ffmpeg_html)
+
+## R configuration
+options(width = 116, scipen = 5)
+```
+<!--
+    ``` ```
+-->
+
+References
+--------------------
+- Critical Data Marathon: http://criticaldata.mit.edu/events/hackathon/index.html
+
+Load packages
+--------------------
+```{r}
+library(ggplot2)
+```
+
+Load data
+--------------------
+```{r}
+## Load ICU stay detail (most important)
+dataIcuStayDetail <- read.csv("~/mimic2/data_ICUSTAY_DETAIL-merge_final.txt")
+
+## Check units
+table(dataIcuStayDetail$ICUSTAY_FIRST_CAREUNIT)
+```
+
+
+SAPS distribution: study cohort
+--------------------
+```{r, w = 10}
+ggplot(data = subset(dataIcuStayDetail, HOSPITAL_EXPIRE_FLG %in% c("Y","N")),
+       mapping = aes(x = SAPSI_FIRST, fill = HOSPITAL_EXPIRE_FLG)) +
+    layer(geom = "histogram", position = "dodge", binwidth = 1) +
+    theme_bw() +
+    theme(legend.key = element_blank())
+```
+
+Checking each cohort assembly step
+--------------------
+```{r}
+## Check total number: 40425
+nrow(dataIcuStayDetail)
+
+## subset to SAPS > 20: 2996
+dataIcuStayDetail <- subset(dataIcuStayDetail,
+                            !is.na(SAPSI_FIRST) &
+                            SAPSI_FIRST > 20
+                            )
+nrow(dataIcuStayDetail)
+
+## subset to first ICU stay: 2787
+dataIcuStayDetail <- subset(dataIcuStayDetail,
+                            !is.na(SAPSI_FIRST) &
+                            SAPSI_FIRST > 20 &
+                            ICUSTAY_FIRST_FLG == "Y"
+                            )
+nrow(dataIcuStayDetail)
+
+
+## subset to first hospital stay: 2309
+dataIcuStayDetail <- subset(dataIcuStayDetail,
+                            !is.na(SAPSI_FIRST) &
+                            SAPSI_FIRST > 20 &
+                            ICUSTAY_FIRST_FLG == "Y" &
+                            HOSPITAL_FIRST_FLG == "Y"   # 2014-01-05
+                            )
+nrow(dataIcuStayDetail)
+
+## subset to MICU: 497
+dataIcuStayDetail <- subset(dataIcuStayDetail,
+                            !is.na(SAPSI_FIRST) &
+                            SAPSI_FIRST > 20 &
+                            ICUSTAY_FIRST_FLG == "Y" &
+                            HOSPITAL_FIRST_FLG == "Y" &
+                            ICUSTAY_FIRST_CAREUNIT == "MICU"
+                            )
+nrow(dataIcuStayDetail)
+```
+
+In-hospital death
+--------------------
+```{r}
+table(dataIcuStayDetail$HOSPITAL_EXPIRE_FLG)
+```
+
+SAPS distribution: study cohort
+--------------------
+```{r, w = 10}
+ggplot(data = dataIcuStayDetail,
+       mapping = aes(x = SAPSI_FIRST, fill = HOSPITAL_EXPIRE_FLG)) +
+    layer(geom = "histogram", position = "dodge", binwidth = 1) +
+    theme_bw() +
+    theme(legend.key = element_blank())
+```
+
+--------------------
+- Table of Contents: http://rpubs.com/kaz_yos/toc
+- Table of Contents (Japanese): http://rpubs.com/kaz_yos/toc-j
+- Top Page: http://rpubs.com/kaz_yos/
+- SlideShare: http://www.slideshare.net/kaz_yos
