@@ -93,8 +93,12 @@ for (databaseName in databaseNames) {
 #### -rw-r--r--     1 kazuki  staff    19G Jan  6 20:40 data_CHARTEVENTS-merge_final.txt # Absolute indication
 #### -rw-r--r--     1 kazuki  staff   1.0G Jan  6 21:01 data_IOEVENTS-merge_final.txt
 #### -rw-r--r--     1 kazuki  staff   1.1G Jan  6 21:04 data_LABEVENTS-merge_final.txt
-#### -rw-r--r--     1 kazuki  staff   1.8G Jan  6 21:12 data_NOTEEVENTS-merge_final.txt
+#### -rw-r--r--     1 kazuki  staff   1.8G Jan  6 21:12 data_NOTEEVENTS-merge_final.txt # Better handled by Sequel Pro
 
+## ## 2GB Note data
+## dataNoteEvents <- read.csv(file = "~/mimic2/data_NOTEEVENTS-merge_final.txt", nrow = 1000)
+## summary(dataNoteEvents)
+## names(dataNoteEvents)
 
 
 ## close connection
